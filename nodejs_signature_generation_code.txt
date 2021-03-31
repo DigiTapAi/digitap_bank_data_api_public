@@ -1,0 +1,36 @@
+// This is the data we want to encrypt
+const crypto = require("crypto")
+
+// base 64 encoded public key
+var publicKey = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlJQklqQU5CZ2txaGtpRzl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUF1MkpUczFCQm9aVHJtZFdtNy82TwphQnR4cngwZXJmQTk2ZWk4WVNhVjVBa2tMZyt4cHJnVkxsYnhxMVVBcFNwQlpzcG1QQmpOUzYya0hWZng5cmZQCjBZZ05oSHVTK2VtY3g3eC9MdDlvZk5PZzMvQU1rRGg5UnpHL3NHMHlISHJRNy84Q1lBRlVhbTBPSStkMlRoanQKa1hmd3N3Y0M0L1p0a1p1VHlXdGpRdmovU0sxZU9rSlkxYk9JT0FlSW0rZXFUeVVpK1RldjlCNGViQ2owZG1ERwp2V3pXUFlWZWlhWXMzTVJhOGk1bnFJekt0RGtIY28wdTdLazRrQ1MvaTFCWjdDMVNBNkROWlJzV3RiZUFqSlZjCjJucjZNUGkyYzdmOHRXYUxtVXljM285bDIrUDdlcEVYY2FoQ013N1RWZTFMQ21FZHIwV3oyNlVLd3FvVnZ6a0IKdFFJREFRQUIKLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t"
+
+var pubKey = Buffer.from(publicKey, 'base64');
+
+let payload = {
+        "client_name": "xyz_demo",
+        "client_ref_num": "xyz123",
+        "txn_completed_cburl": "https://test.com",
+        "start_month": "2020-01",
+        "end_month": "2020-02",
+        "institution_id": "1",
+        "destination": "statementupload",
+        "return_url": "https://test.com",
+      };
+      
+let secret = JSON.stringify(payload);
+ 
+var hash = crypto.createHash("sha256").update(secret).digest("hex");
+
+const encryptedData = crypto.publicEncrypt(
+    {
+        key: pubKey,
+        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+        oaepHash: "sha256",
+    },
+    // We convert the data string to a buffer using `Buffer.from`
+    Buffer.from(hash)
+)
+
+let signature = encryptedData.toString("hex");
+
+console.log("encrypted signature to be passed in request: ", signature)
